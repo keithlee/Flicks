@@ -7,6 +7,7 @@ target 'Flicks' do
 
   # Pods for Flicks
   pod 'AFNetworking', '~> 2.6'
+  pod 'FTIndicator'
 
   target 'FlicksTests' do
     inherit! :search_paths

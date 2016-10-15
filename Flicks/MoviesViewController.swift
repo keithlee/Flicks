@@ -8,6 +8,7 @@
 
 import UIKit
 import AFNetworking
+import FTIndicator
 
 class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -23,7 +24,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.dataSource = self
         // Do any additional setup after loading the view.
         
-        
+        FTIndicator.showProgressWithmessage("")
         
         let apiKey = "6c4f30fcbc63f157eaed2f398dcfd8af"
         let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
@@ -44,6 +45,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
                                     with: data, options:[]) as? NSDictionary {
                                     
                                     self.movies = responseDictionary["results"] as? [NSDictionary]
+                                    FTIndicator.dismissProgress()
                                     self.tableView.reloadData()
                                 }
                             }

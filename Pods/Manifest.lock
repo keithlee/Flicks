@@ -20,13 +20,22 @@ PODS:
   - AFNetworking/UIKit (2.6.3):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
+  - FTIndicator (1.1.5):
+    - FTIndicator/FTNotificationIndicator (= 1.1.5)
+    - FTIndicator/FTProgressIndicator (= 1.1.5)
+    - FTIndicator/FTToastIndicator (= 1.1.5)
+  - FTIndicator/FTNotificationIndicator (1.1.5)
+  - FTIndicator/FTProgressIndicator (1.1.5)
+  - FTIndicator/FTToastIndicator (1.1.5)
 
 DEPENDENCIES:
   - AFNetworking (~> 2.6)
+  - FTIndicator
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
+  FTIndicator: 8b9885b84340a19029ad13672add3bb8183feba8
 
-PODFILE CHECKSUM: 11f09cacc7e265a8a8bb38ce61a79f393a3e1964
+PODFILE CHECKSUM: 7765d0ab4a5f6d2e825a73c85d170220daed033e
 
 COCOAPODS: 1.0.1
