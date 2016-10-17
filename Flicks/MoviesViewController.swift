@@ -13,6 +13,7 @@ import FTIndicator
 class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var errorView: UIView!
     
     var movies: [NSDictionary]?
     let posterUrlBase = "https://image.tmdb.org/t/p/w300"
@@ -22,10 +23,31 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         tableView.delegate = self
         tableView.dataSource = self
-        // Do any additional setup after loading the view.
-        
-        FTIndicator.showProgressWithmessage("")
-        
+        if Reachability.isConnectedToNetwork() {
+            errorView.isHidden = true
+        } else {
+            errorView.isHidden = false
+        }
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(refreshControl:)), for: UIControlEvents.valueChanged)
+        tableView.insertSubview(refreshControl, at: 0)
+        loadMovies(callback: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
+    }
+    
+//    
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        return .lightContent
+//    }
+    
+    func refreshControlAction(refreshControl: UIRefreshControl) {
+        loadMovies(callback: refreshControl.endRefreshing)
+    }
+    
+    func loadMovies(callback: (() -> Void)?) {
         let apiKey = "6c4f30fcbc63f157eaed2f398dcfd8af"
         let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
         let request = URLRequest(url: url!)
@@ -34,11 +56,14 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
             delegate:nil,
             delegateQueue:OperationQueue.main
         )
+        FTIndicator.showProgressWithmessage("")
         
         let task : URLSessionDataTask = session.dataTask(with: request,
                    completionHandler: { (dataOrNil, responseOrNil, errorOrNil) in
                         if let requestError = errorOrNil {
+                            self.errorView.isHidden = false
                             print("Error with api request" + requestError.localizedDescription)
+                            FTIndicator.dismissProgress()
                         } else {
                             if let data = dataOrNil {
                                 if let responseDictionary = try! JSONSerialization.jsonObject(
@@ -47,13 +72,14 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
                                     self.movies = responseDictionary["results"] as? [NSDictionary]
                                     FTIndicator.dismissProgress()
                                     self.tableView.reloadData()
+                                    callback?()
                                 }
                             }
                         }
         });
         task.resume()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -72,12 +98,33 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if let movies = movies {
             let data = movies[indexPath.row] as NSDictionary
             cell.titleLabel.text = data["title"] as? String
-            if let backdrop_path = data["backdrop_path"] as? String {
-                let posterUrl = URL(string: posterUrlBase + backdrop_path)
-                cell.posterView.setImageWith(posterUrl!)
+            
+            if let poster_path = data["poster_path"] as? String {
+                let posterUrl = URL(string: posterUrlBase + poster_path)
+                let urlRequest = URLRequest(url: posterUrl!)
+                cell.posterView.setImageWith(urlRequest, placeholderImage: nil,
+                    success: { (urlRequest, imageResponse, image) in
+                        // imageResponse will be nil if the image is cached
+                        if imageResponse != nil {
+                            cell.posterView.alpha = 0.0
+                            cell.posterView.image = image
+                            UIView.animate(withDuration: 0.5, animations: { () -> Void in
+                                cell.posterView.alpha = 1.0
+                            })
+                        } else {
+                            cell.posterView.image = image
+                        }
+                    },
+                    failure: { (urlRequest, imageResponse, error) in
+                        print(error)
+                    }
+                )
             }
             cell.descriptionLabel.text = data["overview"] as? String
             cell.descriptionLabel.sizeToFit()
+            let backgroundView = UIView()
+            backgroundView.backgroundColor = UIColor.cyan
+            cell.selectedBackgroundView = backgroundView
         }
         return cell
     }
