@@ -254,7 +254,7 @@
 				TargetAttributes = {
 					79F64D451DAF0F2E00FDE7EB = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = 5K27PD58GS;
+						DevelopmentTeam = QGV37CRU79;
 						ProvisioningStyle = Automatic;
 					};
 					79F64D591DAF0F2E00FDE7EB = {
@@ -603,7 +603,7 @@
 			baseConfigurationReference = C80851A1759AE83F42BE935A /* Pods-Flicks.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 5K27PD58GS;
+				DEVELOPMENT_TEAM = QGV37CRU79;
 				INFOPLIST_FILE = Flicks/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.KeithLee.Flicks;
@@ -617,7 +617,7 @@
 			baseConfigurationReference = CFC952078AC1585F423C7EE4 /* Pods-Flicks.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 5K27PD58GS;
+				DEVELOPMENT_TEAM = QGV37CRU79;
 				INFOPLIST_FILE = Flicks/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.KeithLee.Flicks;

@@ -12,7 +12,8 @@ import AFNetworking
 class DetailViewController: UIViewController {
     
     var movie: NSDictionary!
-    let posterUrlBase = "https://image.tmdb.org/t/p/w300"
+    let smallPosterUrlBase = "https://image.tmdb.org/t/p/w300"
+    let largePosterUrlBase = "https://image.tmdb.org/t/p/w600"
     @IBOutlet weak var posterView: UIImageView!
 
     @IBOutlet weak var titleLabel: UILabel!
@@ -38,26 +39,56 @@ class DetailViewController: UIViewController {
         overviewLabel.text = movie["overview"] as? String
         overviewLabel.sizeToFit()
         if let poster_path = movie["poster_path"] as? String {
-            let posterUrl = URL(string: posterUrlBase + poster_path)
-            let urlRequest = URLRequest(url: posterUrl!)
+            let smallPosterUrl = URL(string: smallPosterUrlBase + poster_path)
+            let urlRequest = URLRequest(url: smallPosterUrl!)
             posterView.setImageWith(urlRequest, placeholderImage: nil,
                 success: { (urlRequest, imageResponse, image) in
                     // imageResponse will be nil if the image is cached
                     if imageResponse != nil {
                         self.posterView.alpha = 0.0
                         self.posterView.image = image
-                        UIView.animate(withDuration: 0.3, animations: { () -> Void in
-                            self.posterView.alpha = 1.0
-                        })
+                        
+                        UIView.animate(
+                            withDuration: 1,
+                            animations: {
+                                self.posterView.alpha = 1
+                            },
+                            completion: { (success) in
+                                self.setLargeImage(poster_path: poster_path)
+                            }
+                        )
                     } else {
-                        self.posterView.image = image
+                        UIView.animate(
+                            withDuration: 1,
+                            animations: {
+                                self.posterView.image = image
+                            },
+                            completion: { (success) in
+                                self.setLargeImage(poster_path: poster_path)
+                            }
+                        )
                     }
                 },
                 failure: { (urlRequest, imageResponse, error) in
-                    print(error)
+                    print(error.localizedDescription)
                 }
             )
         }
+    }
+    
+    func setLargeImage(poster_path: String) {
+        let largeUrlRequest = URLRequest(url: URL(string: self.largePosterUrlBase + poster_path)!)
+        self.posterView.setImageWith(
+            largeUrlRequest,
+            placeholderImage: nil,
+            success: { (largeImageRequest, response, largeImage) in
+                self.posterView.image = largeImage
+            },
+            failure: { (request, response, error) in
+                print(error.localizedDescription)
+            }
+        )
+        
     }
 
     override func didReceiveMemoryWarning() {

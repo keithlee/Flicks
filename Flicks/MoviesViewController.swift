@@ -10,12 +10,15 @@ import UIKit
 import AFNetworking
 import FTIndicator
 
-class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var errorView: UIView!
     
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     var movies: [NSDictionary]?
+    var displayedMovies: [NSDictionary]?
     let posterUrlBase = "https://image.tmdb.org/t/p/w300"
     
     override func viewDidLoad() {
@@ -23,6 +26,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         tableView.delegate = self
         tableView.dataSource = self
+        searchBar.delegate = self
         if Reachability.isConnectedToNetwork() {
             errorView.isHidden = true
         } else {
@@ -33,15 +37,6 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.insertSubview(refreshControl, at: 0)
         loadMovies(callback: nil)
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        tableView.reloadData()
-    }
-    
-//    
-//    override var preferredStatusBarStyle: UIStatusBarStyle {
-//        return .lightContent
-//    }
     
     func refreshControlAction(refreshControl: UIRefreshControl) {
         loadMovies(callback: refreshControl.endRefreshing)
@@ -56,6 +51,11 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
             delegate:nil,
             delegateQueue:OperationQueue.main
         )
+        if Reachability.isConnectedToNetwork() {
+            errorView.isHidden = true
+        } else {
+            errorView.isHidden = false
+        }
         FTIndicator.showProgressWithmessage("")
         
         let task : URLSessionDataTask = session.dataTask(with: request,
@@ -70,6 +70,11 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
                                     with: data, options:[]) as? NSDictionary {
                                     
                                     self.movies = responseDictionary["results"] as? [NSDictionary]
+                                    if self.searchBar.text != "" {
+                                        self.displayedMovies = self.filterMovies(text: self.searchBar.text!)
+                                    } else {
+                                        self.displayedMovies = self.movies
+                                    }
                                     FTIndicator.dismissProgress()
                                     self.tableView.reloadData()
                                     callback?()
@@ -86,7 +91,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let movies = movies {
+        if let movies = displayedMovies {
             return movies.count
         } else {
             return 0
@@ -95,7 +100,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell") as! MovieCell
-        if let movies = movies {
+        if let movies = displayedMovies {
             let data = movies[indexPath.row] as NSDictionary
             cell.titleLabel.text = data["title"] as? String
             
@@ -128,6 +133,30 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }
         return cell
     }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText == "" {
+            displayedMovies = movies
+        } else {
+            displayedMovies = filterMovies(text: searchText)
+        }
+        tableView.reloadData()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func filterMovies(text: String) -> [NSDictionary]? {
+        return movies?.filter {
+            let title = $0["title"] as? String
+            if title!.lowercased().contains(text.lowercased()) {
+               return true
+            } else {
+                return false
+            }
+        }
+    }
 
     // MARK: - Navigation
 
@@ -138,7 +167,8 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         let movieCell = sender as! MovieCell
         let indexPath = tableView.indexPath(for: movieCell)
-        let movie = movies?[indexPath!.row]
+        let movie = displayedMovies?[indexPath!.row]
+        movieCell.isSelected = false
         
         let vc = segue.destination as! DetailViewController
         vc.movie = movie
