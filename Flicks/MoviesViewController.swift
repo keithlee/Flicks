@@ -20,6 +20,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     var movies: [NSDictionary]?
     var displayedMovies: [NSDictionary]?
     let posterUrlBase = "https://image.tmdb.org/t/p/w300"
+    var endpoint: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +45,8 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func loadMovies(callback: (() -> Void)?) {
         let apiKey = "6c4f30fcbc63f157eaed2f398dcfd8af"
-        let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let urlString = "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)"
+        let url = URL(string:urlString)
         let request = URLRequest(url: url!)
         let session = URLSession(
             configuration: URLSessionConfiguration.default,
@@ -137,6 +139,8 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText == "" {
             displayedMovies = movies
+            searchBar.resignFirstResponder()
+            searchBar.performSelector(onMainThread: #selector(resignFirstResponder), with: nil, waitUntilDone: false)
         } else {
             displayedMovies = filterMovies(text: searchText)
         }

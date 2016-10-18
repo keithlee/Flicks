@@ -13,7 +13,7 @@ class DetailViewController: UIViewController {
     
     var movie: NSDictionary!
     let smallPosterUrlBase = "https://image.tmdb.org/t/p/w300"
-    let largePosterUrlBase = "https://image.tmdb.org/t/p/w600"
+    let largePosterUrlBase = "https://image.tmdb.org/t/p/original"
     @IBOutlet weak var posterView: UIImageView!
 
     @IBOutlet weak var titleLabel: UILabel!
