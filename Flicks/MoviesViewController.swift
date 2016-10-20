@@ -18,9 +18,9 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     @IBOutlet weak var searchBar: UISearchBar!
     
-    var movies: [NSDictionary]?
-    var displayedMovies: [NSDictionary]?
-    let posterUrlBase = "https://image.tmdb.org/t/p/w300"
+    private var movies: [NSDictionary]?
+    private var displayedMovies: [NSDictionary]?
+    private let posterUrlBase = "https://image.tmdb.org/t/p/w300"
     var endpoint: String!
     
     override func viewDidLoad() {

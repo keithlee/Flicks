@@ -13,8 +13,8 @@ import ReachabilitySwift
 class DetailViewController: UIViewController {
     
     var movie: NSDictionary!
-    let smallPosterUrlBase = "https://image.tmdb.org/t/p/w300"
-    let largePosterUrlBase = "https://image.tmdb.org/t/p/original"
+    private let smallPosterUrlBase = "https://image.tmdb.org/t/p/w300"
+    private let largePosterUrlBase = "https://image.tmdb.org/t/p/original"
     @IBOutlet weak var posterView: UIImageView!
 
     @IBOutlet weak var titleLabel: UILabel!
