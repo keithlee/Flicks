@@ -8,6 +8,7 @@
 
 import UIKit
 import AFNetworking
+import ReachabilitySwift
 
 class DetailViewController: UIViewController {
     
@@ -26,7 +27,8 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        if Reachability.isConnectedToNetwork() {
+        let reachability = Reachability()!
+        if reachability.isReachable {
             errorView.isHidden = true
         } else {
             errorView.isHidden = false
@@ -54,7 +56,7 @@ class DetailViewController: UIViewController {
                                 self.posterView.alpha = 1
                             },
                             completion: { (success) in
-                                self.setLargeImage(poster_path: poster_path)
+                                self.setLargeImage(poster_path)
                             }
                         )
                     } else {
@@ -64,7 +66,7 @@ class DetailViewController: UIViewController {
                                 self.posterView.image = image
                             },
                             completion: { (success) in
-                                self.setLargeImage(poster_path: poster_path)
+                                self.setLargeImage(poster_path)
                             }
                         )
                     }
@@ -76,7 +78,7 @@ class DetailViewController: UIViewController {
         }
     }
     
-    func setLargeImage(poster_path: String) {
+    func setLargeImage(_ poster_path: String) {
         let largeUrlRequest = URLRequest(url: URL(string: self.largePosterUrlBase + poster_path)!)
         self.posterView.setImageWith(
             largeUrlRequest,

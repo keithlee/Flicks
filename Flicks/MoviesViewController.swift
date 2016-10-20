@@ -9,6 +9,7 @@
 import UIKit
 import AFNetworking
 import FTIndicator
+import ReachabilitySwift
 
 class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
 
@@ -28,22 +29,23 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
-        if Reachability.isConnectedToNetwork() {
+        let reachability = Reachability()!
+        if reachability.isReachable {
             errorView.isHidden = true
         } else {
             errorView.isHidden = false
         }
         let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(refreshControlAction(refreshControl:)), for: UIControlEvents.valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshControlAction), for: UIControlEvents.valueChanged)
         tableView.insertSubview(refreshControl, at: 0)
-        loadMovies(callback: nil)
+        loadMovies(nil)
     }
     
-    func refreshControlAction(refreshControl: UIRefreshControl) {
-        loadMovies(callback: refreshControl.endRefreshing)
+    func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        loadMovies(refreshControl.endRefreshing)
     }
     
-    func loadMovies(callback: (() -> Void)?) {
+    func loadMovies(_ callback: (() -> Void)?) {
         let apiKey = "6c4f30fcbc63f157eaed2f398dcfd8af"
         let urlString = "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)"
         let url = URL(string:urlString)
@@ -53,7 +55,8 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
             delegate:nil,
             delegateQueue:OperationQueue.main
         )
-        if Reachability.isConnectedToNetwork() {
+        let reachability = Reachability()!
+        if reachability.isReachable {
             errorView.isHidden = true
         } else {
             errorView.isHidden = false
@@ -73,7 +76,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
                                     
                                     self.movies = responseDictionary["results"] as? [NSDictionary]
                                     if self.searchBar.text != "" {
-                                        self.displayedMovies = self.filterMovies(text: self.searchBar.text!)
+                                        self.displayedMovies = self.filteredMovies(self.searchBar.text!)
                                     } else {
                                         self.displayedMovies = self.movies
                                     }
@@ -142,7 +145,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
             searchBar.resignFirstResponder()
             searchBar.performSelector(onMainThread: #selector(resignFirstResponder), with: nil, waitUntilDone: false)
         } else {
-            displayedMovies = filterMovies(text: searchText)
+            displayedMovies = filteredMovies(searchText)
         }
         tableView.reloadData()
     }
@@ -151,7 +154,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         searchBar.resignFirstResponder()
     }
     
-    func filterMovies(text: String) -> [NSDictionary]? {
+    func filteredMovies(_ text: String) -> [NSDictionary]? {
         return movies?.filter {
             let title = $0["title"] as? String
             if title!.lowercased().contains(text.lowercased()) {
