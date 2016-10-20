@@ -15,6 +15,7 @@ class DetailViewController: UIViewController {
     var movie: NSDictionary!
     private let smallPosterUrlBase = "https://image.tmdb.org/t/p/w300"
     private let largePosterUrlBase = "https://image.tmdb.org/t/p/original"
+    private let reachability = Reachability()!
     @IBOutlet weak var posterView: UIImageView!
 
     @IBOutlet weak var titleLabel: UILabel!
@@ -27,7 +28,6 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        let reachability = Reachability()!
         if reachability.isReachable {
             errorView.isHidden = true
         } else {

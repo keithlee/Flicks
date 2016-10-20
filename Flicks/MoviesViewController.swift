@@ -22,6 +22,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     private var displayedMovies: [NSDictionary]?
     private let posterUrlBase = "https://image.tmdb.org/t/p/w300"
     var endpoint: String!
+    private let reachability = Reachability()!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +30,6 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
-        let reachability = Reachability()!
         if reachability.isReachable {
             errorView.isHidden = true
         } else {
@@ -55,7 +55,6 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
             delegate:nil,
             delegateQueue:OperationQueue.main
         )
-        let reachability = Reachability()!
         if reachability.isReachable {
             errorView.isHidden = true
         } else {
